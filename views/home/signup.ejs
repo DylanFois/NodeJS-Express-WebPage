@@ -1,0 +1,32 @@
+<%- include ("../_partial/_header") %>
+ 
+    <h1>Sign Up page</h1>
+
+<form method="POST" action="/signup">
+    <!-- Email input -->
+    <div class="form-outline mb-4">
+      <input type="email" id="formEmail" class="form-control" />
+      <label class="form-label" for="formEmail">Email address</label>
+    </div>
+  
+    <!-- Password input -->
+    <div class="form-outline mb-4">
+      <input type="password" id="formPassword" class="form-control" />
+      <label class="form-label" for="formPassword">Password</label>
+    </div>
+
+    <div class="form-outline mb-4">
+        <input type="password" id="formPasswordConfirm" class="form-control" />
+        <label class="form-label" for="formPasswordConfirm">Confirm Password</label>
+      </div>
+  
+    <!-- Submit button -->
+    <button type="button" class="btn btn-primary btn-block mb-4">Sign Up</button>
+  
+    <!-- Register buttons -->
+    <div class="text-center">
+      <p>Already have an account? <a href="/login">Log In</a></p>
+    </div>
+  </form>
+ 
+<%- include ("../_partial/_footer") %>
