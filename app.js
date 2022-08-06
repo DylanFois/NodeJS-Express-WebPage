@@ -3,12 +3,12 @@ var path = require("path")
 var ejs = require("ejs")
 var pg = require("pg")
 var passport = require("passport")
+var LocalStrategy = require('passport-local').Strategy
 var session = require("express-session")
 const db = require('./queries')
 const bodyParser = require('body-parser')
 const { initialize } = require("passport")
 const flash = require('connect-flash')
-const multiparty = require('multiparty')
 const bcrypt = require('bcrypt')
 
 var app = express()
@@ -19,9 +19,11 @@ app.set("view engine", "ejs")
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(session({secret: "bruhmomentonumerodos"}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(flash())
-
-// require("./database/passport")(passport)
+require('./database/passport')(passport)
 
 app.use("/", require("./routes/web"))
 app.use("/api", require("./routes/api"))
