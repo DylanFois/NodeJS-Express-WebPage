@@ -13,6 +13,7 @@ router.get("/", function(req,res){
 
 router.get("/home", function(req,res){
     res.render("home/home")
+    console.log(req.session.passport.user)
 })
 
 router.get("/about", function(req,res){
@@ -28,7 +29,15 @@ router.post("/login", passport.authenticate('login', {
     failureRedirect: '/login',
     failureFlash: true
 }), function(req,res){
-    
+
+})
+
+router.get("/logout", passport.authenticate('logout', {
+    successRedirect: '/home',
+    failureRedirect: '/login',
+    failureFlash: true
+}), function(req,res){
+
 })
 
 router.get("/signup", function(req,res){

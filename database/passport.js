@@ -12,7 +12,7 @@ passport.use('login', new LocalStrategy({
     login()
 
 async function login(){
-    results = await pool.query('SELECT passhash, email, firstname FROM users WHERE email = $1', [req.body.email], function(error, results){
+    results = await pool.query('SELECT passhash, email, firstname, user_id FROM users WHERE email = $1', [req.body.email], function(error, results){
         if (error) {
             throw error
           }
@@ -29,7 +29,8 @@ async function login(){
               }else{
             if (match){
                 req.flash('success')
-                return done(null, true)
+                let userid = results.rows[0].user_id
+                return done(null, userid)
             }else{
                 req.flash('danger', "Error while logging in")
                 return done(null, false)
@@ -39,6 +40,7 @@ async function login(){
     })
 }
 }))
+}
 
 passport.serializeUser(function(user, done) {
     done(null, user);
@@ -46,4 +48,3 @@ passport.serializeUser(function(user, done) {
    passport.deserializeUser(function(user, done) {
     done(null, user);
    });
-}
