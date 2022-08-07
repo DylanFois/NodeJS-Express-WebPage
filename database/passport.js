@@ -2,6 +2,7 @@ const passport = require("passport");
 var LocalStrategy = require('passport-local').Strategy
 const pool = require("./database")
 const bcrypt = require('bcrypt')
+const { v4: uuidv4 } = require('uuid')
 
 module.exports = function(){
 
@@ -40,6 +41,36 @@ async function login(){
     })
 }
 }))
+
+passport.use('register', new LocalStrategy({
+    passReqToCallback: true,
+    usernameField: 'email',
+    passwordField: 'password'}, (req, email, password, done) => {
+    register()
+
+async function register(){
+    const hash = await bcrypt.hash(req.body.password, 10, function(err, hash){ // Hash the users password to safely store on the database
+        const firstname = req.body.firstname
+        const lastname = req.body.lastname
+        const email = req.body.email
+        const passhash = hash
+        const userid = uuidv4()
+
+        // Add the user into the database
+        pool.query('INSERT INTO users (user_id, firstname, lastname, email, passhash) VALUES ($1, $2, $3, $4, $5)', [userid, firstname, lastname, email, passhash], (error, results) => {
+          if (error) {
+            console.log(error)
+            req.flash(error)
+            return done(null, false)
+          }else{
+            req.flash('success', 'Successfully registered')
+            return done(null, userid)
+          }
+        })
+    })
+}
+}))
+
 }
 
 passport.serializeUser(function(user, done) {
