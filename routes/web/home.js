@@ -12,21 +12,21 @@ router.get("/", function(req,res){
 
 router.get("/home", function(req,res){
     if (req.isAuthenticated()) {
-        res.render("home/home")
+        res.render("home/home", {message: req.flash()})
         console.log(req.user)
+        console.log(req.session)
     }else{
-        req.flash('message', "You need to log in")
-        res.render('home/login', {message: req.flash('message')})
+        req.flash('error', "You need to log in")
+        res.redirect('/login')
     }
 })
 
 router.get("/about", function(req,res){
-    res.render("home/about")
+    res.render("home/about", {message: req.flash()})
 })
 
 router.get("/login", function(req,res){
     res.render("home/login", {message: req.flash()})
-    console.log(message)
 })
 
 router.post("/login", passport.authenticate('login', {
@@ -42,13 +42,14 @@ router.post("/logout", function(req,res){
         if(err){
             return next(err)
         }
+        req.flash('success', 'Successfully logged out')
         res.redirect('/login')
     })
 
 })
 
 router.get("/signup", function(req,res){
-    res.render("home/signup")
+    res.render("home/signup", {message: req.flash()})
 })
 
 // Registration route for when a user registers on the site

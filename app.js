@@ -5,7 +5,6 @@ var pg = require("pg")
 var passport = require("passport")
 var LocalStrategy = require('passport-local').Strategy
 var session = require("express-session")
-const db = require('./queries')
 const bodyParser = require('body-parser')
 const { initialize } = require("passport")
 const flash = require('connect-flash')
@@ -19,7 +18,7 @@ app.set("view engine", "ejs")
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(session({secret: "bruhmomentonumerodos"}));
+app.use(session({secret: "da8*#VB^8VBy8BUIUB6789o#"}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash())

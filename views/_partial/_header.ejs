@@ -33,4 +33,18 @@
         </div>
       </nav>
 
+      <% if(message.error) { %>
+        <div class="alert alert-danger" style='text-align: center' role="alert">
+          <%= message.error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      <% if(message.success) { %>
+        <div class="alert alert-success" style='text-align: center' role="alert">
+          <%= message.success %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+
+      <br><br>
 <div class="container">

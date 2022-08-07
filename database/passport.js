@@ -18,7 +18,7 @@ async function login(){
             throw error
           }
         if (results.rows[0] == null){
-            req.flash('danger', "email not found")
+            req.flash('error', "No account found with that email")
             return done(null, false)
         }
         const passhash = results.rows[0].passhash.replace(/ /g,'')
@@ -29,11 +29,11 @@ async function login(){
                 console.log(error)
               }else{
             if (match){
-                req.flash('success')
                 let userid = results.rows[0].user_id
+                req.flash('success', 'Logged in successfully!')
                 return done(null, userid)
             }else{
-                req.flash('danger', "Error while logging in")
+                req.flash('error', "Error while logging in")
                 return done(null, false)
             }
         }
@@ -49,26 +49,38 @@ passport.use('register', new LocalStrategy({
     register()
 
 async function register(){
-    const hash = await bcrypt.hash(req.body.password, 10, function(err, hash){ // Hash the users password to safely store on the database
-        const firstname = req.body.firstname
-        const lastname = req.body.lastname
-        const email = req.body.email
-        const passhash = hash
-        const userid = uuidv4()
-
-        // Add the user into the database
-        pool.query('INSERT INTO users (user_id, firstname, lastname, email, passhash) VALUES ($1, $2, $3, $4, $5)', [userid, firstname, lastname, email, passhash], (error, results) => {
-          if (error) {
-            console.log(error)
-            req.flash(error)
+    
+    const results = await pool.query('SELECT email FROM users WHERE email = $1', [req.body.email], function(error, results){
+        if(error){
+            req.flash('error', 'Email check attempt failed')
             return done(null, false)
-          }else{
-            req.flash('success', 'Successfully registered')
-            return done(null, userid)
-          }
-        })
+        }
+        if(results.rows[0]){
+            req.flash('error', 'An account with that email address already exists')
+            return done(null, false)
+        }else{
+            const hash = bcrypt.hash(req.body.password, 10, function(err, hash){
+                const firstname = req.body.firstname
+                const lastname = req.body.lastname
+                const email = req.body.email
+                const passhash = hash
+                const userid = uuidv4()
+                pool.query('INSERT INTO users (user_id, firstname, lastname, email, passhash) VALUES ($1, $2, $3, $4, $5)', [userid, firstname, lastname, email, passhash], (error, results) => {
+                    if (error) {
+                      console.log(error)
+                      req.flash(error)
+                      return done(null, false)
+                    }else{
+                      req.flash('success', 'Successfully registered')
+                      return done(null, userid)
+                    }
+                  })
+
+            })
+        }
     })
 }
+
 }))
 
 }
