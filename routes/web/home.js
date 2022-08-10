@@ -27,14 +27,23 @@ router.get("/about", function(req,res){
 
 router.get("/login", function(req,res){
     res.render("home/login", {message: req.flash()})
+    console.log("hi")
+    console.log(res.locals.message)
 })
 
 router.post("/login", passport.authenticate('login', {
-    successRedirect: '/home',
+    successRedirect: '/loginSuccess',
     failureRedirect: '/login',
     failureFlash: true
 }), function(req,res){
-    
+
+})
+
+router.get("/loginSuccess", function(req,res){
+if (req.isAuthenticated){
+    req.flash('success', 'Successfully logged in!')
+    res.redirect("/home")
+}
 })
 
 router.post("/logout", function(req,res){
@@ -54,11 +63,18 @@ router.get("/signup", function(req,res){
 
 // Registration route for when a user registers on the site
 router.post("/signup", passport.authenticate('register', {
-    successRedirect: '/home',
+    successRedirect: '/signupSuccess',
     failureRedirect: '/signup',
     failureFlash: true
 }), async function(req,res){
 
 })
+
+router.get("/signupSuccess", function(req,res){
+    if (req.isAuthenticated){
+        req.flash('success', 'Successfully registered!')
+        res.redirect("/home")
+    }
+    })
 
 module.exports = router

@@ -13,11 +13,11 @@ passport.use('login', new LocalStrategy({
     login()
 
 async function login(){
-    results = await pool.query('SELECT passhash, email, firstname, user_id FROM users WHERE email = $1', [req.body.email], function(error, results){
+    results = await pool.query('SELECT passhash, email, firstname, lastname, user_id FROM users WHERE email = $1', [req.body.email], function(error, results){ // Get the hash value from the database using the email provided
         if (error) {
             throw error
           }
-        if (results.rows[0] == null){
+        if (results.rows[0] == null){ // If nothing is returned in results, the email does not exist on the database
             req.flash('error', "No account found with that email")
             return done(null, false)
         }
@@ -30,10 +30,8 @@ async function login(){
               }else{
             if (match){
                 let userid = results.rows[0].user_id
-                req.flash('success', 'Logged in successfully!')
-                return done(null, userid)
+                return done(null, {userid: userid, firstname: results.rows[0].firstname, lastname: results.rows[0].lastname})
             }else{
-                req.flash('error', "Error while logging in")
                 return done(null, false)
             }
         }
@@ -50,12 +48,12 @@ passport.use('register', new LocalStrategy({
 
 async function register(){
     
-    const results = await pool.query('SELECT email FROM users WHERE email = $1', [req.body.email], function(error, results){
+    const results = await pool.query('SELECT email FROM users WHERE email = $1', [req.body.email], function(error, results){ // Attempt to retrieve an email from the database that matches the one provided
         if(error){
             req.flash('error', 'Email check attempt failed')
             return done(null, false)
         }
-        if(results.rows[0]){
+        if(results.rows[0]){ // If there is a match, then registration will not proceed due to an account already having that email
             req.flash('error', 'An account with that email address already exists')
             return done(null, false)
         }else{
@@ -65,14 +63,12 @@ async function register(){
                 const email = req.body.email
                 const passhash = hash
                 const userid = uuidv4()
-                pool.query('INSERT INTO users (user_id, firstname, lastname, email, passhash) VALUES ($1, $2, $3, $4, $5)', [userid, firstname, lastname, email, passhash], (error, results) => {
+                pool.query('INSERT INTO users (user_id, firstname, lastname, email, passhash) VALUES ($1, $2, $3, $4, $5)', [userid, firstname, lastname, email, passhash], (error, results) => { // Insert the users information into the database
                     if (error) {
                       console.log(error)
-                      req.flash(error)
                       return done(null, false)
                     }else{
-                      req.flash('success', 'Successfully registered')
-                      return done(null, userid)
+                      return done(null, {userid: userid, firstname: firstname, lastname: lastname})
                     }
                   })
 
